@@ -1,0 +1,57 @@
+generator client {
+  provider                    = "prisma-client-py"
+  output                      = "../database/client_db"
+  recursive_type_depth        = "5"
+  enable_experimental_decimal = "true"
+  interface                   = "asyncio"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model users {
+  id             String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email          String  @unique @db.VarChar
+  first_name     String  @db.VarChar
+  last_name      String  @db.VarChar
+  phone          String? @db.VarChar
+  email_verified Boolean
+  role           String  @db.VarChar
+  shop           shop[]
+}
+
+model resource_group {
+  id                    String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  azure_blob_storage_id String? @db.VarChar
+  database_id           String? @db.VarChar
+  web_app_id            String? @db.VarChar
+  shop                  shop[]
+}
+
+model shop {
+  id                 String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name               String               @db.VarChar
+  headline           String?              @db.VarChar
+  about              String?              @db.VarChar
+  currency           String               @db.VarChar
+  logoimg            String?              @db.VarChar
+  bannerimg          String?              @db.VarChar
+  country            String               @db.VarChar
+  status             String               @db.VarChar
+  verified           Boolean
+  owner_id           String               @db.Uuid
+  resource_group_id  String?              @db.Uuid
+  users              users                @relation(fields: [owner_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  resource_group     resource_group?      @relation(fields: [resource_group_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  shop_externallinks shop_externallinks[]
+}
+
+model shop_externallinks {
+  id               BigInt @id @default(autoincrement())
+  shop_id          String @db.Uuid
+  name             BigInt
+  external_link_id BigInt
+  shop             shop   @relation(fields: [shop_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
