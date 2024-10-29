@@ -1,4 +1,6 @@
+import logging
 from contextlib import asynccontextmanager
+from app.v1.private_routes import router as private_router
 
 from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
@@ -16,6 +18,13 @@ async def lifespan(app: FastAPI):
     await client_db.disconnect()
     await shops_db.disconnect()
 
+logging.basicConfig(
+    level=logging.DEBUG,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+)
+
+logger = logging.getLogger(__name__)
+
 
 app = FastAPI(
     title=config.PROJECT_NAME,
@@ -29,3 +38,5 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.include_router(private_router)
