@@ -5,7 +5,7 @@ from app.core.security import keycloak_openid
 
 router = APIRouter()
 
-@router.get("/auth/login", summary="Redirect to Keycloak login page", tags=["auth"])
+@router.get("/login", summary="Redirect to Keycloak login page", tags=["auth"])
 async def redirect_to_keycloak():
     authorization_url = (
         f"{settings.KEYCLOAK_URL}/realms/{settings.KEYCLOAK_REALM}/protocol/openid-connect/auth"
@@ -15,7 +15,7 @@ async def redirect_to_keycloak():
     )
     return RedirectResponse(url=authorization_url)
 
-@router.get("/auth/callback", tags=["auth"])
+@router.get("/callback", tags=["auth"])
 async def auth_callback(request: Request):
     code = request.query_params.get("code")
     if not code:
