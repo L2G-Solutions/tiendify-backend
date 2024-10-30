@@ -60,3 +60,5 @@ def has_role(role_name: str):
             raise HTTPException(status_code=403, detail="Unauthorized access")
 
     return check_role
+
+

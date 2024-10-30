@@ -1,6 +1,7 @@
 import logging
 from contextlib import asynccontextmanager
-from app.v1.private_routes import router as private_router
+from app.routes.auth.private_routes import router as auth_private_router
+from app.routes.auth.public_routes import router as auth_public_router
 
 from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
@@ -39,4 +40,5 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(private_router)
+app.include_router(auth_private_router, prefix="/auth/private")
+app.include_router(auth_public_router, prefix="/auth/public")
