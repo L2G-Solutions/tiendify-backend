@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, Response
 
 from app.database import get_shops_db
+from app.models.products import ProductCreate
 from app.routes.products.utils import (
     parse_products_response_data,
     parse_single_product_response_data,
@@ -46,3 +47,25 @@ async def handle_get_product(
         return Response(status_code=404)
 
     return parse_single_product_response_data(product)
+
+
+@router.post("/")
+async def handle_create_product(
+    data: ProductCreate, shop_db: ShopsClient = Depends(get_shops_db)
+):
+    new_product = await shop_db.products.create(
+        data={
+            "name": data.name,
+            "description": data.description,
+            "stock": data.stock,
+            "price": int(data.price),
+            "product_categories": {
+                "create": [{"category_id": c} for c in data.categories]
+            },
+        },
+        include={
+            "product_categories": {"include": {"categories": True}},
+            "products_mediafiles": {"include": {"mediafiles": True}},
+        },
+    )
+    return parse_single_product_response_data(new_product)
