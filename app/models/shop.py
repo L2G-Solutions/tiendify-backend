@@ -15,4 +15,3 @@ class ShopCreate(BaseModel):
     status: str
     verified: bool
     owner_id: UUID
-    resource_group_id: Optional[UUID] = None
