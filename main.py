@@ -1,14 +1,14 @@
 import logging
 from contextlib import asynccontextmanager
-from app.routes.auth.private_routes import router as auth_private_router
-from app.routes.auth.public_routes import router as auth_public_router
-from app.routes.shops import router as shop_router
 
 from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
 
 from app import config
 from app.database import client_db, shops_db
+from app.routes.auth.private_routes import router as auth_private_router
+from app.routes.auth.public_routes import router as auth_public_router
+from app.routes.shops import router as shop_router
 
 
 @asynccontextmanager
@@ -20,9 +20,10 @@ async def lifespan(app: FastAPI):
     await client_db.disconnect()
     await shops_db.disconnect()
 
+
 logging.basicConfig(
     level=logging.DEBUG,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
 )
 
 logger = logging.getLogger(__name__)
@@ -42,6 +43,6 @@ app.add_middleware(
 )
 
 app.include_router(auth_private_router, prefix="/auth/private")
-app.include_router(auth_public_router, prefix="/auth/public")  
+app.include_router(auth_public_router, prefix="/auth/public")
 
-app.include_router(shop_router, prefix="/shops/private" )
+app.include_router(shop_router, prefix="/shops/private")

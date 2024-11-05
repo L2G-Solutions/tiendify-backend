@@ -10,23 +10,24 @@ keycloak_openid = KeycloakOpenID(
     server_url=settings.KEYCLOAK_URL,
     client_id=settings.KEYCLOAK_CLIENT_ID,
     realm_name=settings.KEYCLOAK_REALM,
-    client_secret_key=settings.KEYCLOAK_CLIENT_SECRET
+    client_secret_key=settings.KEYCLOAK_CLIENT_SECRET,
 )
 
 oauth2_scheme = OAuth2AuthorizationCodeBearer(
     tokenUrl=f"{settings.KEYCLOAK_URL}/realms/{settings.KEYCLOAK_REALM}/protocol/openid-connect/token",
     authorizationUrl=f"{settings.KEYCLOAK_URL}/realms/{settings.KEYCLOAK_REALM}/protocol/openid-connect/auth",
-    refreshUrl=f"{settings.KEYCLOAK_URL}/realms/{settings.KEYCLOAK_REALM}/protocol/openid-connect/token"
+    refreshUrl=f"{settings.KEYCLOAK_URL}/realms/{settings.KEYCLOAK_REALM}/protocol/openid-connect/token",
 )
+
 
 async def valid_access_token(access_token: str = Depends(oauth2_scheme)):
     jwks_url = f"{settings.KEYCLOAK_URL}/realms/{settings.KEYCLOAK_REALM}/protocol/openid-connect/certs"
     jwks_client = PyJWKClient(jwks_url)
-    
+
     try:
         signing_key = jwks_client.get_signing_key_from_jwt(access_token)
         print(f"Signing key: {signing_key.key}")
-        
+
         decoded_token = decode(
             access_token,
             signing_key.key,
@@ -46,19 +47,19 @@ async def valid_access_token(access_token: str = Depends(oauth2_scheme)):
 
 
 def has_role(role_name: str):
-    async def check_role(
-        token_data: Annotated[dict, Depends(valid_access_token)]
-    ):
+    async def check_role(token_data: Annotated[dict, Depends(valid_access_token)]):
         resource_access = token_data.get("resource_access")
-        
-        if not resource_access or "tiendify" not in resource_access or "roles" not in resource_access["tiendify"]:
+
+        if (
+            not resource_access
+            or "tiendify" not in resource_access
+            or "roles" not in resource_access["tiendify"]
+        ):
             raise HTTPException(status_code=403, detail="No roles found in token")
-        
+
         roles = resource_access["tiendify"]["roles"]
-        
+
         if role_name not in roles:
             raise HTTPException(status_code=403, detail="Unauthorized access")
 
     return check_role
-
-
