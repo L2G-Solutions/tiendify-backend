@@ -45,4 +45,4 @@ app.add_middleware(
 app.include_router(auth_private_router, prefix="/auth/private")
 app.include_router(auth_public_router, prefix="/auth/public")
 
-app.include_router(shop_router, prefix="/shops/private")
+app.include_router(shop_router, prefix="/shops")
