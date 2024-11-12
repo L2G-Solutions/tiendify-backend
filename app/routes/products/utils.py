@@ -1,3 +1,6 @@
+from database.client_shop_db.models import products
+
+
 def parse_products_response_data(data: list[dict]) -> list[dict]:
     """Parse products response data to remove unwanted fields,
     and return the proper JSON schema.
@@ -35,15 +38,15 @@ def parse_products_response_data(data: list[dict]) -> list[dict]:
     ]
 
 
-def parse_single_product_response_data(data: list[dict]) -> list[dict]:
+def parse_single_product_response_data(data: products) -> dict:
     """Parse single product response data to remove unwanted fields,
     and return the proper JSON schema.
 
     Args:
-        data (list[dict]): The data to be parsed (response from Prisma).
+        data (products): The data to be parsed (products model response from Prisma).
 
     Returns:
-        list[dict]: The parsed data.
+        dict: The parsed data.
     """
 
     return {
