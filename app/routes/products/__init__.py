@@ -100,3 +100,16 @@ async def handle_update_product(
 
     return parse_single_product_response_data(updated_product)
 
+
+@router.delete("/{product_id}")
+async def handle_delete_product(
+    product_id: int, shop_db: ShopsClient = Depends(get_shops_db)
+):
+    deleted_product = await shop_db.products.delete(where={"id": product_id})
+
+    if deleted_product is None:
+        return Response(status=404)
+
+    return Response(status=204)
+
+
