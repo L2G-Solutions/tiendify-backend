@@ -1,4 +1,6 @@
-from fastapi import APIRouter, Depends, Response
+from uuid import uuid4
+
+from fastapi import APIRouter, Depends, Response, UploadFile
 
 from app.database import get_shops_db
 from app.models.products import ProductCreate
@@ -6,6 +8,7 @@ from app.routes.products.utils import (
     parse_products_response_data,
     parse_single_product_response_data,
 )
+from app.services.storage import upload_file
 from database.client_shop_db import Prisma as ShopsClient
 
 router = APIRouter(tags=["products"])
@@ -113,3 +116,23 @@ async def handle_delete_product(
     return Response(status=204)
 
 
+@router.post("/{product_id}/mediafile")
+async def handle_create_product_mediafile(
+    product_id: int, mediafile: UploadFile, shop_db: ShopsClient = Depends(get_shops_db)
+):
+    id_ = str(uuid4())
+
+    upload_file(mediafile.file, "products/" + id_)
+
+    new_mediafile = await shop_db.mediafiles.create(
+        data={
+            "url": "products/" + id_,
+            "type": mediafile.content_type if mediafile.content_type else "image/jpeg",
+        }
+    )
+
+    await shop_db.products_mediafiles.create(
+        data={"product_id": product_id, "mediafile_id": new_mediafile.id}
+    )
+
+    return new_mediafile
