@@ -69,3 +69,34 @@ async def handle_create_product(
         },
     )
     return parse_single_product_response_data(new_product)
+
+
+@router.put("/{product_id}")
+async def handle_update_product(
+    product_id: int, data: ProductCreate, shop_db: ShopsClient = Depends(get_shops_db)
+):
+    await shop_db.product_categories.delete_many(
+        where={"product_id": product_id, "category_id": {"not_in": data.categories}}
+    )
+    updated_product = await shop_db.products.update(
+        where={"id": product_id},
+        data={
+            "name": data.name,
+            "description": data.description,
+            "stock": data.stock,
+            "price": int(data.price),
+            "product_categories": {
+                "create": [{"category_id": c} for c in data.categories]
+            },
+        },
+        include={
+            "product_categories": {"include": {"categories": True}},
+            "products_mediafiles": {"include": {"mediafiles": True}},
+        },
+    )
+
+    if updated_product is None:
+        return Response(status=404)
+
+    return parse_single_product_response_data(updated_product)
+
