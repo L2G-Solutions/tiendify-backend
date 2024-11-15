@@ -110,7 +110,7 @@ async def handle_update_product(
     )
 
     if updated_product is None:
-        return Response(status=404)
+        return Response(status_code=404)
 
     return parse_single_product_response_data(updated_product)
 
@@ -122,9 +122,9 @@ async def handle_delete_product(
     deleted_product = await shop_db.products.delete(where={"id": product_id})
 
     if deleted_product is None:
-        return Response(status=404)
+        return Response(status_code=404)
 
-    return Response(status=204)
+    return Response(status_code=204)
 
 
 @router.post("/{product_id}/mediafile")
