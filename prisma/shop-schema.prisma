@@ -79,11 +79,12 @@ model payments {
 }
 
 model product_categories {
-  id          BigInt     @id @default(autoincrement())
   product_id  BigInt
   category_id String     @db.VarChar
   categories  categories @relation(fields: [category_id], references: [slug], onDelete: NoAction, onUpdate: NoAction)
   products    products   @relation(fields: [product_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@id([product_id, category_id])
 }
 
 model products {

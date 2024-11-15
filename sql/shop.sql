@@ -81,9 +81,9 @@ CREATE TABLE
 
 CREATE TABLE
     IF NOT EXISTS product_categories (
-        id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
         product_id BIGINT NOT NULL,
         category_id VARCHAR NOT NULL,
+        PRIMARY KEY (product_id, category_id),
         FOREIGN KEY (product_id) REFERENCES products (id),
         FOREIGN KEY (category_id) REFERENCES categories (slug)
     );
