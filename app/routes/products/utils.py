@@ -1,12 +1,12 @@
 from database.client_shop_db.models import products
 
 
-def parse_products_response_data(data: list[dict]) -> list[dict]:
+def parse_products_response_data(data: list[products]) -> list[dict]:
     """Parse products response data to remove unwanted fields,
     and return the proper JSON schema.
 
     Args:
-        data (list[dict]): The data to be parsed (response from Prisma).
+        data (list[products]): The data to be parsed (response from Prisma).
 
     Returns:
         list[dict]: The parsed data.
