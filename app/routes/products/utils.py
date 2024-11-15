@@ -18,6 +18,7 @@ def parse_products_response_data(data: list[products]) -> list[dict]:
             "name": p.name,
             "price": p.price,
             "description": p.description,
+            "isHidden": p.hidden,
             "categories": [
                 {
                     "id": c.categories.slug,
@@ -65,4 +66,5 @@ def parse_single_product_response_data(data: products) -> dict:
         "mediafiles": [m.mediafiles.url for m in data.products_mediafiles],
         "stock": data.stock,
         "createdAt": data.created_at,
+        "isHidden": data.hidden,
     }

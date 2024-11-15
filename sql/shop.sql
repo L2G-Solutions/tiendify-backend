@@ -35,7 +35,8 @@ CREATE TABLE
         description VARCHAR NOT NULL,
         price BIGINT NOT NULL,
         stock INT NOT NULL,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        hidden BOOLEAN DEFAULT FALSE NOT NULL,
     );
 
 CREATE TABLE

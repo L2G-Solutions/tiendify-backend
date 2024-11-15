@@ -7,3 +7,4 @@ class ProductCreate(BaseModel):
     description: str
     stock: int
     categories: list[str]
+    hidden: bool = False
