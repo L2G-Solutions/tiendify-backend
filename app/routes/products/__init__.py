@@ -89,7 +89,18 @@ async def handle_update_product(
             "stock": data.stock,
             "price": int(data.price),
             "product_categories": {
-                "create": [{"category_id": c} for c in data.categories]
+                "connect_or_create": [
+                    {
+                        "create": {"category_id": c},
+                        "where": {
+                            "product_id_category_id": {
+                                "product_id": product_id,
+                                "category_id": c,
+                            }
+                        },
+                    }
+                    for c in data.categories
+                ]
             },
         },
         include={
