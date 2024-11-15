@@ -85,7 +85,7 @@ CREATE TABLE
         product_id BIGINT NOT NULL,
         category_id VARCHAR NOT NULL,
         PRIMARY KEY (product_id, category_id),
-        FOREIGN KEY (product_id) REFERENCES products (id),
+        FOREIGN KEY (product_id) REFERENCES products (id) ON DELETE CASCADE,
         FOREIGN KEY (category_id) REFERENCES categories (slug)
     );
 
@@ -103,6 +103,6 @@ CREATE TABLE
         id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
         product_id BIGINT NOT NULL,
         media_file_id BIGINT NOT NULL,
-        FOREIGN KEY (product_id) REFERENCES products (id),
+        FOREIGN KEY (product_id) REFERENCES products (id) ON DELETE CASCADE,
         FOREIGN KEY (media_file_id) REFERENCES mediafiles (id)
     );
