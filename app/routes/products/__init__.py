@@ -16,9 +16,13 @@ router = APIRouter(tags=["products"])
 
 @router.get("/")
 async def handle_get_products(
-    shop_db: ShopsClient = Depends(get_shops_db), limit: int = 20, offset: int = 0
+    shop_db: ShopsClient = Depends(get_shops_db),
+    limit: int = 20,
+    offset: int = 0,
+    search: str = None,
 ):
     data = await shop_db.products.find_many(
+        where={"name": {"contains": search}} if search else None,
         include={
             "product_categories": {"include": {"categories": True}},
             "products_mediafiles": {"include": {"mediafiles": True}, "take": 1},
