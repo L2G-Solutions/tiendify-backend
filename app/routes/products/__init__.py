@@ -3,7 +3,7 @@ from uuid import uuid4
 from fastapi import APIRouter, Depends, Response, UploadFile
 
 from app.database import get_shops_db
-from app.models.products import ProductCreate
+from app.models.products import ProductCreate, ProductUpdateVisibility
 from app.routes.products.utils import (
     parse_products_response_data,
     parse_single_product_response_data,
@@ -151,3 +151,20 @@ async def handle_create_product_mediafile(
     )
 
     return new_mediafile
+
+
+@router.patch("/{product_id}/visibility")
+async def handle_change_product_visibility(
+    data: ProductUpdateVisibility,
+    product_id: int,
+    shop_db: ShopsClient = Depends(get_shops_db),
+):
+
+    updated_product = await shop_db.products.update(
+        where={"id": product_id}, data={"hidden": data.hidden}
+    )
+
+    if not updated_product:
+        return Response(status_code=404)
+
+    return parse_single_product_response_data(updated_product)

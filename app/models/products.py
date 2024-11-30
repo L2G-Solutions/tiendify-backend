@@ -8,3 +8,7 @@ class ProductCreate(BaseModel):
     stock: int
     categories: list[str]
     hidden: bool = False
+
+
+class ProductUpdateVisibility(BaseModel):
+    hidden: bool
