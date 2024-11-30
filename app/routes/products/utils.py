@@ -61,9 +61,12 @@ def parse_single_product_response_data(data: products) -> dict:
                 "name": c.categories.name,
                 "description": c.categories.description,
             }
-            for c in data.product_categories
+            for c in (data.product_categories if data.product_categories else [])
         ],
-        "mediafiles": [m.mediafiles.url for m in data.products_mediafiles],
+        "mediafiles": [
+            m.mediafiles.url
+            for m in (data.products_mediafiles if data.products_mediafiles else [])
+        ],
         "stock": data.stock,
         "createdAt": data.created_at,
         "isHidden": data.hidden,
