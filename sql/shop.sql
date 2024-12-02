@@ -44,7 +44,9 @@ CREATE TABLE
         id UUID DEFAULT gen_random_uuid () PRIMARY KEY,
         amount BIGINT NOT NULL,
         method VARCHAR NOT NULL,
-        status VARCHAR NOT NULL CHECK (status IN ('PENDING', 'PAID', 'FAILED')),
+        status VARCHAR NOT NULL CHECK (
+            status IN ('PENDING', 'PAID', 'FAILED', 'CANCELLED')
+        ),
         paid_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
 
@@ -60,7 +62,13 @@ CREATE TABLE
         id UUID DEFAULT gen_random_uuid () PRIMARY KEY,
         address_id BIGINT NOT NULL,
         status VARCHAR NOT NULL CHECK (
-            status IN ('PENDING', 'SHIPPED', 'DELIVERED', 'RETURNED')
+            status IN (
+                'PENDING',
+                'SHIPPED',
+                'DELIVERED',
+                'RETURNED',
+                'CANCELLED'
+            )
         ),
         estimated_delivery INT NOT NULL,
         delivered_at TIMESTAMP,
