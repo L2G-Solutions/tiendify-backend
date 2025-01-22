@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from fastapi import Depends, HTTPException
+from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2AuthorizationCodeBearer
 from jwt import PyJWKClient, decode
 from jwt.exceptions import ExpiredSignatureError, InvalidTokenError
@@ -66,3 +66,18 @@ def has_role(role_name: str):
             raise HTTPException(status_code=403, detail="Unauthorized access")
 
     return check_role
+
+
+async def get_current_user(token_data: Annotated[dict, Depends(valid_access_token)]):
+    try:
+        print("Extracting user info")
+        user_info = {
+            "username": token_data.get("preferred_username"),
+            "email": token_data.get("email"),
+            "firstName": token_data.get("given_name"),
+            "lastName": token_data.get("family_name"),
+        }
+        return user_info
+    except KeyError as e:
+        print(f"Error extracting user info: {e}")
+        raise HTTPException(status_code=400, detail="Invalid token structure")

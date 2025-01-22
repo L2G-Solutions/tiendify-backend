@@ -1,12 +1,14 @@
 from fastapi import APIRouter, Depends
-from app.core.security import valid_access_token, has_role
 
-router = APIRouter()
+from app.core.security import get_current_user, valid_access_token
 
-@router.get("/private", dependencies=[Depends(valid_access_token)], tags=["auth"])
-async def get_private():
-    return {"message": "Private endpoint"}
+router = APIRouter(tags=["auth"])
 
-@router.get("/admin", dependencies=[Depends(has_role("admin"))], tags=["auth"])
-def get_admin():
-    return {"message": "Admin only"}
+
+@router.get(
+    "/me",
+    summary="Get current user information",
+    dependencies=[Depends(valid_access_token)],
+)
+async def get_logged_user(user: dict = Depends(get_current_user)):
+    return {"user": user}
