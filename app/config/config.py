@@ -16,9 +16,12 @@ class Settings(BaseSettings):
     AZURE_DEFAULT_REGION: str = "eastus"
     AZURE_WEBAPP_DEFAULT_SKU: str = "B1"
     AZURE_WEBAPP_DEFAULT_TIER: str = "Basic"
+    AZURE_DB_DEFAULT_USERNAME: str
+    AZURE_DB_DEFAULT_PASSWORD: str
     AZURE_DB_DEFAULT_SKU: str = "standard_b1ms"
     AZURE_DB_DEFAULT_TIER: str = "Burstable"
     AZURE_STORAGE_DEFAULT_SKU: str = "Standard_LRS"
+    AZURE_DEFAULT_STORAGE_ACCOUNT: str
 
     class Config:
         env_file = ".env"
