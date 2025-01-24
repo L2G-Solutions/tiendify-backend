@@ -8,10 +8,6 @@ from app import config
 from app.database import client_db, shops_db
 from app.routes.auth.private_routes import router as auth_private_router
 from app.routes.auth.public_routes import router as auth_public_router
-from app.routes.categories import router as category_router
-from app.routes.customers import router as customer_router
-from app.routes.orders import router as order_router
-from app.routes.products import router as product_router
 from app.routes.shops import router as shop_router
 from app.routes.shops.proxy import router as shop_proxy_router
 
@@ -51,9 +47,5 @@ app.include_router(auth_private_router, prefix="/auth/private")
 app.include_router(auth_public_router, prefix="/auth/public")
 
 app.include_router(shop_router, prefix="/shops")
-app.include_router(product_router, prefix="/products")
-app.include_router(category_router, prefix="/categories")
-app.include_router(order_router, prefix="/orders")
-app.include_router(customer_router, prefix="/customers")
 
 app.include_router(shop_proxy_router)
