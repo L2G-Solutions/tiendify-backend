@@ -5,7 +5,6 @@ class Settings(BaseSettings):
     PROJECT_NAME: str = "Tiendify"
     KEYCLOAK_URL: str
     KEYCLOAK_REALM: str
-    REDIRECT_URI: str
     KEYCLOAK_CLIENT_ID: str
     KEYCLOAK_CLIENT_SECRET: str
     DATABASE_URL: str
