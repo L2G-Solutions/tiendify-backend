@@ -1,6 +1,5 @@
 from app.config.config import settings
 from app.database import client_db as db
-from app.exceptions import ShopNotFound
 from app.services.azure.provisioning.database import create_postgresql_database
 from app.services.azure.provisioning.storage import create_public_container
 from app.services.azure.provisioning.webapp import create_web_app
