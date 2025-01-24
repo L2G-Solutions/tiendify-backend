@@ -5,8 +5,6 @@ from app.database import get_client_db
 from app.models.auth import UserTokenInfo
 from database.client_db import Prisma
 
-router = APIRouter(tags=["auth"])
-
 
 @router.get(
     "/me",

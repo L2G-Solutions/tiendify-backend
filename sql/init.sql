@@ -14,7 +14,8 @@ CREATE TABLE
         id UUID DEFAULT gen_random_uuid () PRIMARY KEY,
         azure_blob_storage_id VARCHAR,
         database_id VARCHAR,
-        web_app_id VARCHAR
+        web_app_id VARCHAR,
+        api_url VARCHAR
     );
 
 CREATE TABLE
