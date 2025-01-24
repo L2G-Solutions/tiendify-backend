@@ -80,4 +80,3 @@ async def authorize(
         max_age=token_response["refresh_expires_in"],
     )
 
-    return response

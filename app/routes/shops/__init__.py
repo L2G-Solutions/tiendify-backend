@@ -6,35 +6,25 @@ from prisma.errors import PrismaError
 
 router = APIRouter()
 
+
 @router.post("/", tags=["shops"])
-async def create_shop(
-    shop: ShopCreate,
-    client_db: Prisma = Depends(get_client_db)
-):
+async def create_shop(shop: ShopCreate, client_db: Prisma = Depends(get_client_db)):
     try:
-        user = await client_db.users.find_unique(
-            where={
-                "id": str(shop.owner_id)
-            }
-        )
-        
+        user = await client_db.users.find_unique(where={"id": str(shop.owner_id)})
+
         if not user:
             raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"Invalid data"
+                status_code=status.HTTP_404_NOT_FOUND, detail=f"Invalid data"
             )
 
         if shop.resource_group_id:
             resource_group = await client_db.resource_group.find_unique(
-                where={
-                    "id": str(shop.resource_group_id)
-                }
+                where={"id": str(shop.resource_group_id)}
             )
-            
+
             if not resource_group:
                 raise HTTPException(
-                    status_code=status.HTTP_404_NOT_FOUND,
-                    detail=f"Invalid data"
+                    status_code=status.HTTP_404_NOT_FOUND, detail=f"Invalid data"
                 )
 
         shop_data = {
@@ -49,7 +39,7 @@ async def create_shop(
             "verified": shop.verified,
             "owner_id": str(shop.owner_id),
         }
-        
+
         if shop.resource_group_id:
             shop_data["resource_group_id"] = str(shop.resource_group_id)
 
@@ -60,20 +50,14 @@ async def create_shop(
         if "P2003" in str(e):
             if "shop_owner_id_fkey" in str(e):
                 raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="OI"
+                    status_code=status.HTTP_400_BAD_REQUEST, detail="OI"
                 )
             elif "resource_group_id_fkey" in str(e):
                 raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="RI"
+                    status_code=status.HTTP_400_BAD_REQUEST, detail="RI"
                 )
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e)
-        )
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
     except Exception as e:
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=str(e)
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e)
         )

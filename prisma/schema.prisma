@@ -1,9 +1,9 @@
 generator client {
   provider                    = "prisma-client-py"
   output                      = "../database/client_db"
+  interface                   = "asyncio"
   recursive_type_depth        = "5"
   enable_experimental_decimal = "true"
-  interface                   = "asyncio"
 }
 
 datasource db {
@@ -27,6 +27,7 @@ model resource_group {
   azure_blob_storage_id String? @db.VarChar
   database_id           String? @db.VarChar
   web_app_id            String? @db.VarChar
+  api_url               String? @db.VarChar
   shop                  shop[]
 }
 

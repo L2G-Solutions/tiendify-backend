@@ -3,6 +3,7 @@ from pydantic import BaseModel
 from typing import Optional
 from uuid import UUID
 
+
 class ShopCreate(BaseModel):
     name: str
     headline: Optional[str] = None
@@ -14,4 +15,3 @@ class ShopCreate(BaseModel):
     status: str
     verified: bool
     owner_id: UUID
-    resource_group_id: Optional[UUID] = None
