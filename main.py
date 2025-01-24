@@ -43,7 +43,7 @@ logger = logging.getLogger(__name__)
 
 
 app = FastAPI(
-    title=config.PROJECT_NAME,
+    title=settings.PROJECT_NAME,
     lifespan=lifespan,
 )
 
