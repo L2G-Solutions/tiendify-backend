@@ -35,15 +35,10 @@ async def valid_access_token(access_token: str = Depends(cookie_scheme)):
             options={"verify_exp": True},
         )
 
-        # if "realm_access" in decoded_token:
-        #     if "access" not in decoded_token["realm_access"].get("roles", []):
-        #         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not enough permissions")
         return decoded_token
-    except ExpiredSignatureError as e:
-        print(f"Expired token: {str(e)}")
+    except ExpiredSignatureError:
         raise HTTPException(status_code=401, detail="Token expired")
-    except InvalidTokenError as e:
-        print(f"Invalid token: {str(e)}")
+    except InvalidTokenError:
         raise HTTPException(status_code=401, detail="Not authenticated")
 
 
