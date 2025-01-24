@@ -5,7 +5,7 @@ from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
 
 from app import config
-from app.database import client_db, shops_db
+from app.database import client_db
 from app.routes.auth.private_routes import router as auth_private_router
 from app.routes.auth.public_routes import router as auth_public_router
 from app.routes.shops import router as shop_router
@@ -15,11 +15,9 @@ from app.routes.shops.proxy import router as shop_proxy_router
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     await client_db.connect()
-    await shops_db.connect()
     print("Connected to database")
     yield
     await client_db.disconnect()
-    await shops_db.disconnect()
 
 
 logging.basicConfig(

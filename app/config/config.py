@@ -9,7 +9,6 @@ class Settings(BaseSettings):
     KEYCLOAK_CLIENT_ID: str
     KEYCLOAK_CLIENT_SECRET: str
     DATABASE_URL: str
-    SHOP_DATABASE_URL: str
     AZURE_SUBSCRIPTION_ID: str
     AZURE_RESOURCE_GROUP: str
     SHOPS_BACKEND_DOCKER_IMAGE: str
