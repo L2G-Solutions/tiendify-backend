@@ -1,7 +1,7 @@
 from typing import Annotated
 
-from fastapi import Depends, HTTPException, status
-from fastapi.security import OAuth2AuthorizationCodeBearer
+from fastapi import Depends, HTTPException
+from fastapi.security import APIKeyCookie
 from jwt import PyJWKClient, decode
 from jwt.exceptions import ExpiredSignatureError, InvalidTokenError
 from keycloak import KeycloakOpenID
@@ -16,14 +16,11 @@ keycloak_openid = KeycloakOpenID(
     client_secret_key=settings.KEYCLOAK_CLIENT_SECRET,
 )
 
-oauth2_scheme = OAuth2AuthorizationCodeBearer(
-    tokenUrl=f"{settings.KEYCLOAK_URL}/realms/{settings.KEYCLOAK_REALM}/protocol/openid-connect/token",
-    authorizationUrl=f"{settings.KEYCLOAK_URL}/realms/{settings.KEYCLOAK_REALM}/protocol/openid-connect/auth",
-    refreshUrl=f"{settings.KEYCLOAK_URL}/realms/{settings.KEYCLOAK_REALM}/protocol/openid-connect/token",
-)
+
+cookie_scheme = APIKeyCookie(name="access_token")
 
 
-async def valid_access_token(access_token: str = Depends(oauth2_scheme)):
+async def valid_access_token(access_token: str = Depends(cookie_scheme)):
     jwks_url = f"{settings.KEYCLOAK_URL}/realms/{settings.KEYCLOAK_REALM}/protocol/openid-connect/certs"
     jwks_client = PyJWKClient(jwks_url, timeout=10)
 

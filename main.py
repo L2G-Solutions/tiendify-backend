@@ -1,14 +1,14 @@
 import logging
 from contextlib import asynccontextmanager
-from app.routes.auth.private_routes import router as auth_private_router
-from app.routes.auth.public_routes import router as auth_public_router
-from app.routes.shops import router as shop_router
 
 from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
 
-from app import config
+from app.config.config import settings
 from app.database import client_db, shops_db
+from app.routes.auth.private_routes import router as auth_private_router
+from app.routes.auth.public_routes import router as auth_public_router
+from app.routes.shops import router as shop_router
 
 
 @asynccontextmanager
@@ -16,6 +16,20 @@ async def lifespan(app: FastAPI):
     await client_db.connect()
     await shops_db.connect()
     print("Connected to database")
+
+    if app.openapi_schema:
+        app.openapi_schema["components"]["securitySchemes"] = {
+            "cookieAuth": {
+                "type": "apiKey",
+                "in": "cookie",
+                "name": "access_token",
+            }
+        }
+
+        for path in app.openapi_schema["paths"].values():
+            for method in path.values():
+                method["security"] = [{"cookieAuth": []}]
+
     yield
     await client_db.disconnect()
     await shops_db.disconnect()
