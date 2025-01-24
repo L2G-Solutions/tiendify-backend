@@ -79,6 +79,6 @@ async def get_current_user(
             "firstName": token_data.get("given_name"),
             "lastName": token_data.get("family_name"),
         }
-        return user_info
+        return UserTokenInfo(**user_info)
     except KeyError as e:
         raise HTTPException(status_code=400, detail="Invalid token structure")
