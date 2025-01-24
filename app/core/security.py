@@ -7,6 +7,7 @@ from jwt.exceptions import ExpiredSignatureError, InvalidTokenError
 from keycloak import KeycloakOpenID
 
 from app.config.config import settings
+from app.models.auth import UserTokenInfo
 
 keycloak_openid = KeycloakOpenID(
     server_url=settings.KEYCLOAK_URL,
@@ -68,9 +69,10 @@ def has_role(role_name: str):
     return check_role
 
 
-async def get_current_user(token_data: Annotated[dict, Depends(valid_access_token)]):
+async def get_current_user(
+    token_data: Annotated[dict, Depends(valid_access_token)]
+) -> UserTokenInfo:
     try:
-        print("Extracting user info")
         user_info = {
             "username": token_data.get("preferred_username"),
             "email": token_data.get("email"),
@@ -79,5 +81,4 @@ async def get_current_user(token_data: Annotated[dict, Depends(valid_access_toke
         }
         return user_info
     except KeyError as e:
-        print(f"Error extracting user info: {e}")
         raise HTTPException(status_code=400, detail="Invalid token structure")
