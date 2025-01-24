@@ -1,4 +1,7 @@
+from asgiref.sync import async_to_sync
+
 from app.config.config import settings
+from app.core.tasks.celery import celery
 from app.database import client_db as db
 from app.services.azure.provisioning.database import create_postgresql_database
 from app.services.azure.provisioning.storage import create_public_container
@@ -20,6 +23,11 @@ def get_web_app_resource_name(shop_id: str) -> str:
 
 def get_storage_resource_name(shop_id: str) -> str:
     return f"storage-{shop_id}"
+
+
+@celery.task
+def create_cloud_resources_for_user_task(shop_id: str) -> shop:
+    return async_to_sync(create_cloud_resources_for_user)(shop_id)
 
 
 async def create_cloud_resources_for_user(shop_id: str) -> shop:

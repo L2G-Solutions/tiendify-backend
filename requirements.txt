@@ -1,6 +1,7 @@
 amqp==5.3.1
 annotated-types==0.7.0
 anyio==4.6.0
+asgiref==3.8.1
 asttokens==2.4.1
 async-property==0.2.2
 azure-common==1.1.28
@@ -82,6 +83,7 @@ python-multipart==0.0.12
 pywin32==306
 PyYAML==6.0.2
 pyzmq==25.1.2
+redis==5.2.1
 requests==2.32.3
 requests-oauthlib==2.0.0
 requests-toolbelt==1.0.0
