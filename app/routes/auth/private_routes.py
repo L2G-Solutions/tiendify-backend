@@ -16,7 +16,9 @@ async def get_logged_user(
     user: UserTokenInfo = Depends(get_current_user),
     client_db: Prisma = Depends(get_client_db),
 ):
-    user_info = await client_db.users.find_unique({"email": user.email})
+    user_info = await client_db.users.find_unique(
+        {"email": user.email}, include={"shop": True}
+    )
 
     if not user_info:
         raise HTTPException(status_code=404, detail="User not found")
