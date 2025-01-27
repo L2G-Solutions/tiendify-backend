@@ -12,3 +12,8 @@ class MailTemplates:
             template,
             {"request": request, **kwargs},
         ).body.decode()
+
+    def render_store_created_template(self, user_name: str, store_name: str):
+        return self._render(
+            "store_created.html", user_name=user_name, store_name=store_name
+        )
