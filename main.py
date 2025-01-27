@@ -4,7 +4,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
 
-from app import config
+from app.config.config import settings
 from app.database import client_db
 from app.routes.auth.private_routes import router as auth_private_router
 from app.routes.auth.public_routes import router as auth_public_router
