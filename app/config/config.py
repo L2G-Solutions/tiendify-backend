@@ -3,6 +3,7 @@ from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
     PROJECT_NAME: str = "Tiendify"
+    ALLOWED_HOSTS: str
     KEYCLOAK_URL: str
     KEYCLOAK_REALM: str
     KEYCLOAK_CLIENT_ID: str
