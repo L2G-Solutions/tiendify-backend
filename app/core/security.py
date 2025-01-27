@@ -17,10 +17,22 @@ keycloak_openid = KeycloakOpenID(
 )
 
 
-cookie_scheme = APIKeyCookie(name="access_token")
+cookie_scheme = APIKeyCookie(name="access_token", auto_error=False)
+refresh_cookie_scheme = APIKeyCookie(name="refresh_token", auto_error=False)
 
 
-async def valid_access_token(access_token: str = Depends(cookie_scheme)):
+async def valid_access_token(
+    access_token: str = Depends(
+        cookie_scheme,
+    ),
+    refresh_token: str = Depends(refresh_cookie_scheme),
+):
+    if not refresh_token:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+
+    if refresh_token and not access_token:
+        raise HTTPException(status_code=403, detail="Not authenticated")
+
     jwks_url = f"{settings.KEYCLOAK_URL}/realms/{settings.KEYCLOAK_REALM}/protocol/openid-connect/certs"
     jwks_client = PyJWKClient(jwks_url, timeout=10)
 
@@ -37,7 +49,7 @@ async def valid_access_token(access_token: str = Depends(cookie_scheme)):
 
         return decoded_token
     except ExpiredSignatureError:
-        raise HTTPException(status_code=401, detail="Token expired")
+        raise HTTPException(status_code=403, detail="Token expired")
     except InvalidTokenError:
         raise HTTPException(status_code=401, detail="Not authenticated")
 

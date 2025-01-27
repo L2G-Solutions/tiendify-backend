@@ -3,12 +3,13 @@ from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
     PROJECT_NAME: str = "Tiendify"
+    ALLOWED_HOSTS: str
     KEYCLOAK_URL: str
     KEYCLOAK_REALM: str
     KEYCLOAK_CLIENT_ID: str
     KEYCLOAK_CLIENT_SECRET: str
     DATABASE_URL: str
-    SHOP_DATABASE_URL: str
+    STORE_API_SCRET_KEY: str
     AZURE_SUBSCRIPTION_ID: str
     AZURE_RESOURCE_GROUP: str
     SHOPS_BACKEND_DOCKER_IMAGE: str
