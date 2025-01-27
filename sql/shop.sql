@@ -115,3 +115,15 @@ CREATE TABLE
         FOREIGN KEY (product_id) REFERENCES products (id) ON DELETE CASCADE,
         FOREIGN KEY (media_file_id) REFERENCES mediafiles (id)
     );
+
+CREATE TABLE
+    IF NOT EXISTS secret_keys (
+        id UUID DEFAULT gen_random_uuid () PRIMARY KEY,
+        name VARCHAR NOT NULL,
+        prefix VARCHAR NOT NULL,
+        secret_key VARCHAR NOT NULL,
+        scopes VARCHAR NOT NULL,
+        enabled BOOLEAN DEFAULT TRUE NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );

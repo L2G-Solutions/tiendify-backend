@@ -16,6 +16,20 @@ from app.routes.shops.proxy import router as shop_proxy_router
 async def lifespan(app: FastAPI):
     await client_db.connect()
     print("Connected to database")
+
+    if app.openapi_schema:
+        app.openapi_schema["components"]["securitySchemes"] = {
+            "cookieAuth": {
+                "type": "apiKey",
+                "in": "cookie",
+                "name": "access_token",
+            }
+        }
+
+        for path in app.openapi_schema["paths"].values():
+            for method in path.values():
+                method["security"] = [{"cookieAuth": []}]
+
     yield
     await client_db.disconnect()
 
@@ -29,13 +43,15 @@ logger = logging.getLogger(__name__)
 
 
 app = FastAPI(
-    title=config.PROJECT_NAME,
+    title=settings.PROJECT_NAME,
     lifespan=lifespan,
 )
 
+origins = settings.ALLOWED_HOSTS.split(",")
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
