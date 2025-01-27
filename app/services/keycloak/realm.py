@@ -1,4 +1,3 @@
-# app/services/keycloak/realm.py
 import aiohttp
 from app.config.config import settings
 
@@ -10,7 +9,7 @@ async def create_keycloak_realm(shop_id: str) -> str:
         token_url = f"{settings.KEYCLOAK_URL}/realms/master/protocol/openid-connect/token"
         auth_data = {
             "client_id": "admin-cli",
-            "username": settings.KEYCLOAK_ADMIN_USER, 
+            "username": settings.KEYCLOAK_ADMIN_USER,
             "password": settings.KEYCLOAK_ADMIN_PASSWORD,
             "grant_type": "password"
         }
@@ -31,9 +30,9 @@ async def create_keycloak_realm(shop_id: str) -> str:
             "registrationAllowed": True,
             "loginWithEmailAllowed": True
         }
-        
+
         async with session.post(realm_url, json=realm_config, headers=headers) as resp:
-            if resp.status not in [201, 409]:
+            if resp.status not in [201, 409]:  # 409 si ya existe
                 error = await resp.text()
                 raise Exception(f"Error creating realm: {error}")
                 

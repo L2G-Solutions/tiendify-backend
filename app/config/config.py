@@ -8,7 +8,7 @@ class Settings(BaseSettings):
     KEYCLOAK_REALM: str
     KEYCLOAK_CLIENT_ID: str
     KEYCLOAK_CLIENT_SECRET: str
-    KEYCLOAK_REALM_PREFIX: str
+    KEYCLOAK_REALM_PREFIX: str = "shop-keycloak-"
     KEYCLOAK_ADMIN_USER: str
     KEYCLOAK_ADMIN_PASSWORD: str
     DATABASE_URL: str

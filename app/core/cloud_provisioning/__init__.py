@@ -54,6 +54,11 @@ async def create_cloud_resources_for_user(shop_id: str) -> shop:
     realm_name = await create_keycloak_realm(shop_id)
 
     await db.resource_group.update(
+        where={"id": rg.id},
+        data={"keycloak_realm": realm_name}
+    )
+
+    await db.resource_group.update(
         data={"database_id": database.id},
         where={"id": rg.id},
     )
