@@ -7,6 +7,7 @@ from app.services.azure.provisioning.database import create_postgresql_database
 from app.services.azure.provisioning.storage import create_public_container
 from app.services.azure.provisioning.webapp import create_web_app
 from database.client_db.models import shop
+from services.keycloak import create_keycloak_realm
 
 
 def get_database_resource_name(shop_id: str) -> str:
@@ -43,12 +44,14 @@ async def create_cloud_resources_for_user(shop_id: str) -> shop:
     """
     rg = await db.resource_group.create({})
     updated_shop = await db.shop.update({"resource_group_id": rg.id}, {"id": shop_id})
-
+    
     database = create_postgresql_database(
         get_database_resource_name(shop_id),
         admin_user=settings.AZURE_DB_DEFAULT_USERNAME,
         admin_password=settings.AZURE_DB_DEFAULT_PASSWORD,
     )
+    
+    realm_name = await create_keycloak_realm(shop_id)
 
     await db.resource_group.update(
         data={"database_id": database.id},
