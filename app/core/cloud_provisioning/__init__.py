@@ -75,7 +75,7 @@ async def create_cloud_resources_for_user(shop_id: str) -> shop:
                 settings.AZURE_DB_DEFAULT_USERNAME,
                 settings.AZURE_DB_DEFAULT_PASSWORD,
             ),
-            "AZURE_STORAGE_CONTAINER": settings.AZURE_DEFAULT_STORAGE_ACCOUNT,
+            "AZURE_STORAGE": settings.AZURE_DEFAULT_STORAGE_ACCOUNT,
             "AZURE_PUBLIC_CONTAINER": storage.container_name,
             "SECRET_KEY": settings.STORE_API_SCRET_KEY,
             "KEYCLOAK_URL": settings.KEYCLOAK_URL,
