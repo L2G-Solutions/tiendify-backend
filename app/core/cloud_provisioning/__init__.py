@@ -1,6 +1,7 @@
 from asgiref.sync import async_to_sync
 
-from app.config.config import settings
+from app.config.config import Settings, settings
+from app.core.cloud_provisioning.utils import build_database_url
 from app.core.tasks.celery import celery
 from app.database import client_db as db
 from app.services.azure.provisioning.database import create_postgresql_database
@@ -67,6 +68,21 @@ async def create_cloud_resources_for_user(shop_id: str) -> shop:
     backend = create_web_app(
         get_asp_resource_name(shop_id),
         get_web_app_resource_name(shop_id),
+        env_vars={
+            "PROJECT_NAME": updated_shop.name,
+            "DATABASE_URL": build_database_url(
+                database.fully_qualified_domain_name,
+                settings.AZURE_DB_DEFAULT_USERNAME,
+                settings.AZURE_DB_DEFAULT_PASSWORD,
+            ),
+            "AZURE_STORAGE_CONTAINER": settings.AZURE_DEFAULT_STORAGE_ACCOUNT,
+            "AZURE_PUBLIC_CONTAINER": storage.container_name,
+            "SECRET_KEY": settings.STORE_API_SCRET_KEY,
+            "KEYCLOAK_URL": settings.KEYCLOAK_URL,
+            "KEYCLOAK_CLIENT_ID": "admin-cli",
+            "KEYCLOAK_REALM": "<PLACEHOLDER>",  # TODO: Replace with shop realm
+            "KEYCLOAK_CLIENT_SECRET": "",
+        },
     )
 
     await db.resource_group.update(
