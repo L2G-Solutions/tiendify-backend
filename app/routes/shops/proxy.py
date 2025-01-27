@@ -4,6 +4,7 @@ import urllib.parse
 import httpx
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 
+from app.config.config import settings
 from app.core.security import get_current_user, valid_access_token
 from app.database import get_client_db
 from app.models.auth import UserTokenInfo
@@ -62,6 +63,9 @@ async def shop_reverse_proxy(request: Request, client_db: Prisma, user: UserToke
         )
     )
 
+    headers = dict(request.headers)
+    headers["Authorization"] = f"Bearer {settings.STORE_API_SCRET_KEY}"
+
     response = None
 
     async with httpx.AsyncClient() as client:
@@ -69,7 +73,7 @@ async def shop_reverse_proxy(request: Request, client_db: Prisma, user: UserToke
             method=request.method,
             url=target_url,
             json=body,
-            headers=dict(request.headers),
+            headers=headers,
         )
         response = response.json()
 
