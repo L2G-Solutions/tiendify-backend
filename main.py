@@ -6,6 +6,7 @@ from starlette.middleware.cors import CORSMiddleware
 
 from app.config.config import settings
 from app.database import client_db
+from app.routes import router as main_router
 from app.routes.auth.private_routes import router as auth_private_router
 from app.routes.auth.public_routes import router as auth_public_router
 from app.routes.shops import router as shop_router
@@ -35,7 +36,7 @@ async def lifespan(app: FastAPI):
 
 
 logging.basicConfig(
-    level=logging.DEBUG,
+    level=logging.INFO,
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
 )
 
@@ -57,6 +58,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(main_router)
 app.include_router(auth_private_router, prefix="/auth/private")
 app.include_router(auth_public_router, prefix="/auth/public")
 

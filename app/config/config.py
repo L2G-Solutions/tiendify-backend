@@ -22,6 +22,7 @@ class Settings(BaseSettings):
     AZURE_DB_DEFAULT_TIER: str = "Burstable"
     AZURE_STORAGE_DEFAULT_SKU: str = "Standard_LRS"
     AZURE_DEFAULT_STORAGE_ACCOUNT: str
+    CELERY_BROKER_URL: str
 
     class Config:
         env_file = ".env"
