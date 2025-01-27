@@ -42,6 +42,7 @@ async def create_cloud_resources_for_user(shop_id: str) -> shop:
     Returns:
         shop: The updated shop object
     """
+    await db.connect()
     rg = await db.resource_group.create({})
     updated_shop = await db.shop.update({"resource_group_id": rg.id}, {"id": shop_id})
 
@@ -93,4 +94,5 @@ async def create_cloud_resources_for_user(shop_id: str) -> shop:
         where={"id": rg.id},
     )
 
+    await db.disconnect()
     return updated_shop
