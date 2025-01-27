@@ -57,9 +57,9 @@ async def shop_reverse_proxy(request: Request, client_db: Prisma, user: UserToke
             urllib.parse.urlparse(shop_api_url).scheme,
             urllib.parse.urlparse(shop_api_url).netloc,
             request.url.path,
+            None,
             request.url.query,
-            request.url.fragment,
-            "",
+            None,
         )
     )
 
