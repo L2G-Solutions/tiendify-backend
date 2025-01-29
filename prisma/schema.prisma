@@ -2,8 +2,8 @@ generator client {
   provider                    = "prisma-client-py"
   output                      = "../database/client_db"
   recursive_type_depth        = "5"
-  interface                   = "asyncio"
   enable_experimental_decimal = "true"
+  interface                   = "asyncio"
 }
 
 datasource db {
@@ -28,7 +28,7 @@ model resource_group {
   database_id           String? @db.VarChar
   web_app_id            String? @db.VarChar
   api_url               String? @db.VarChar
-  keycloak_realm        String? @db.VarChar
+  keycloak_realm        String? @unique(map: "unique_keycloak_realm") @db.VarChar
   shop                  shop[]
 }
 
