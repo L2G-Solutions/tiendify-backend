@@ -1,12 +1,12 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 
+from app.core.cloud_provisioning import create_cloud_resources_for_user_task
 from app.core.security import get_current_user
+from app.core.tasks import run_in_background
 from app.database import get_client_db
 from app.models.auth import UserTokenInfo
 from app.models.shop import ShopCreate
 from database.client_db import Prisma
-from app.core.tasks import run_in_background
-from app.core.cloud_provisioning import create_cloud_resources_for_user_task
 
 router = APIRouter()
 
@@ -65,6 +65,7 @@ async def handle_get_shop_resources(
             "database": bool(rg.shop[0].resource_group.database_id),
             "api": bool(rg.shop[0].resource_group.web_app_id),
             "storage": bool(rg.shop[0].resource_group.azure_blob_storage_id),
+            "authRealm": bool(rg.shop[0].resource_group.keycloak_realm),
         }
     except IndexError:
         raise HTTPException(status_code=404, detail="User has no shop")
