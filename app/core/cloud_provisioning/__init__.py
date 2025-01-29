@@ -11,6 +11,7 @@ from app.services.azure.provisioning.database import create_postgresql_database
 from app.services.azure.provisioning.storage import create_public_container
 from app.services.azure.provisioning.webapp import create_web_app
 from database.client_db.models import shop
+from app.services.keycloak.realm import create_keycloak_realm
 
 
 def get_database_resource_name(shop_id: str) -> str:
@@ -56,6 +57,16 @@ async def create_cloud_resources_for_user(shop_id: str) -> shop:
         admin_user=settings.AZURE_DB_DEFAULT_USERNAME,
         admin_password=settings.AZURE_DB_DEFAULT_PASSWORD,
     )
+    
+    keycloak_info = await create_keycloak_realm(shop_id)
+    realm_name = keycloak_info["realm_name"]
+    client_id = keycloak_info["client_id"]
+    client_secret = keycloak_info["client_secret"]
+
+    await db.resource_group.update(
+        where={"id": rg.id},
+        data={"keycloak_realm": realm_name}
+    )
 
     await db.resource_group.update(
         data={"database_id": database.id},
@@ -74,7 +85,7 @@ async def create_cloud_resources_for_user(shop_id: str) -> shop:
     backend = create_web_app(
         get_asp_resource_name(shop_id),
         get_web_app_resource_name(shop_id),
-        env_vars={
+        env_vars = {
             "PROJECT_NAME": updated_shop.name,
             "DATABASE_URL": build_database_url(
                 database.fully_qualified_domain_name,
@@ -85,10 +96,10 @@ async def create_cloud_resources_for_user(shop_id: str) -> shop:
             "AZURE_PUBLIC_CONTAINER": storage.container_name,
             "SECRET_KEY": settings.STORE_API_SCRET_KEY,
             "KEYCLOAK_URL": settings.KEYCLOAK_URL,
-            "KEYCLOAK_CLIENT_ID": "admin-cli",
-            "KEYCLOAK_REALM": "<PLACEHOLDER>",  # TODO: Replace with shop realm
-            "KEYCLOAK_CLIENT_SECRET": "",
-        },
+            "KEYCLOAK_CLIENT_ID": client_id, 
+            "KEYCLOAK_REALM": realm_name,
+            "KEYCLOAK_CLIENT_SECRET": client_secret,
+        }
     )
 
     await db.resource_group.update(
