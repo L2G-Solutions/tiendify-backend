@@ -64,7 +64,7 @@ async def shop_reverse_proxy(request: Request, client_db: Prisma, user: UserToke
         )
     )
 
-    headers = {"Authorization": f"Bearer {settings.STORE_API_SCRET_KEY}"}
+    headers = {"Authorization": f"Bearer {settings.STORE_API_SECRET_KEY}"}
 
     response = await httpx.AsyncClient().request(
         method=request.method,
