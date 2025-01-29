@@ -32,7 +32,7 @@ async def create_keycloak_realm(shop_id: str) -> str:
         }
 
         async with session.post(realm_url, json=realm_config, headers=headers) as resp:
-            if resp.status not in [201, 409]:  # 409 si ya existe
+            if resp.status not in [201, 409]:
                 error = await resp.text()
                 raise Exception(f"Error creating realm: {error}")
                 
