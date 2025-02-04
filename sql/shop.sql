@@ -35,7 +35,8 @@ CREATE TABLE
         description VARCHAR NOT NULL,
         price BIGINT NOT NULL,
         stock INT NOT NULL,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        hidden BOOLEAN DEFAULT FALSE NOT NULL,
     );
 
 CREATE TABLE
@@ -43,7 +44,9 @@ CREATE TABLE
         id UUID DEFAULT gen_random_uuid () PRIMARY KEY,
         amount BIGINT NOT NULL,
         method VARCHAR NOT NULL,
-        status VARCHAR NOT NULL CHECK (status IN ('PENDING', 'PAID', 'FAILED')),
+        status VARCHAR NOT NULL CHECK (
+            status IN ('PENDING', 'PAID', 'FAILED', 'CANCELLED')
+        ),
         paid_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
 
@@ -59,7 +62,13 @@ CREATE TABLE
         id UUID DEFAULT gen_random_uuid () PRIMARY KEY,
         address_id BIGINT NOT NULL,
         status VARCHAR NOT NULL CHECK (
-            status IN ('PENDING', 'SHIPPED', 'DELIVERED', 'RETURNED')
+            status IN (
+                'PENDING',
+                'SHIPPED',
+                'DELIVERED',
+                'RETURNED',
+                'CANCELLED'
+            )
         ),
         estimated_delivery INT NOT NULL,
         delivered_at TIMESTAMP,
@@ -81,10 +90,10 @@ CREATE TABLE
 
 CREATE TABLE
     IF NOT EXISTS product_categories (
-        id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
         product_id BIGINT NOT NULL,
         category_id VARCHAR NOT NULL,
-        FOREIGN KEY (product_id) REFERENCES products (id),
+        PRIMARY KEY (product_id, category_id),
+        FOREIGN KEY (product_id) REFERENCES products (id) ON DELETE CASCADE,
         FOREIGN KEY (category_id) REFERENCES categories (slug)
     );
 
@@ -93,6 +102,7 @@ CREATE TABLE
         id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
         order_id BIGINT NOT NULL,
         product_id BIGINT NOT NULL,
+        quantity INT NOT NULL,
         FOREIGN KEY (order_id) REFERENCES orders (id),
         FOREIGN KEY (product_id) REFERENCES products (id)
     );
@@ -102,6 +112,18 @@ CREATE TABLE
         id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
         product_id BIGINT NOT NULL,
         media_file_id BIGINT NOT NULL,
-        FOREIGN KEY (product_id) REFERENCES products (id),
+        FOREIGN KEY (product_id) REFERENCES products (id) ON DELETE CASCADE,
         FOREIGN KEY (media_file_id) REFERENCES mediafiles (id)
+    );
+
+CREATE TABLE
+    IF NOT EXISTS secret_keys (
+        id UUID DEFAULT gen_random_uuid () PRIMARY KEY,
+        name VARCHAR NOT NULL,
+        prefix VARCHAR NOT NULL,
+        secret_key VARCHAR NOT NULL,
+        scopes VARCHAR NOT NULL,
+        enabled BOOLEAN DEFAULT TRUE NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );

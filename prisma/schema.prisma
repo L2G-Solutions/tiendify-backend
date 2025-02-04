@@ -27,6 +27,8 @@ model resource_group {
   azure_blob_storage_id String? @db.VarChar
   database_id           String? @db.VarChar
   web_app_id            String? @db.VarChar
+  api_url               String? @db.VarChar
+  keycloak_realm        String? @unique(map: "unique_keycloak_realm") @db.VarChar
   shop                  shop[]
 }
 
