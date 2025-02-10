@@ -1,10 +1,14 @@
 from datetime import datetime, timedelta, timezone
 
-from fastapi import APIRouter, HTTPException, Request, Response, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.responses import JSONResponse, RedirectResponse
 
 from app.config.config import settings
 from app.core.security import keycloak_openid
+from app.database import get_client_db
+from app.models.auth import SignupPayload
+from app.services.keycloak.users import create_keycloak_user
+from database.client_db import Prisma
 
 router = APIRouter()
 
@@ -81,3 +85,30 @@ async def authorize(
     )
 
     return response
+
+
+@router.post("/signup")
+async def handle_signup(payload: SignupPayload, db: Prisma = Depends(get_client_db)):
+    user = await db.users.find_unique(where={"email": payload.email})
+    if user:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="User already exists"
+        )
+
+    res = await create_keycloak_user(payload.username, payload.email, payload.password, payload.firstName, payload.lastName)
+
+    if not res:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Error creating user"
+        )
+
+    new_user = await db.users.create(data={
+        "email": payload.email,
+        "first_name": payload.firstName,
+        "last_name": payload.lastName,
+        "phone": payload.phone,
+        "role": "USER",
+        "email_verified": False
+    })
+
+    return new_user
