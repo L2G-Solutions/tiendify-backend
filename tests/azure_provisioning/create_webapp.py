@@ -4,6 +4,8 @@ from app.services.azure.provisioning.webapp import create_web_app
 
 
 class TestCreateWebApp(unittest.TestCase):
+    """Test the creation of a Web App in Azure."""
+
     def test_create_web_app(self):
         app_service_plan_name = "test-asp"
         web_app_name = "test-was"

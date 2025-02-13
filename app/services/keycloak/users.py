@@ -5,6 +5,15 @@ from app.config.config import settings
 
 
 async def get_keycloak_token():
+    """Authenticates with Keycloak using the admin credentials and returns the access token.
+
+    Raises:
+        Exception: Could not get token.
+        Exception: No access token.
+
+    Returns:
+        str: Access token.
+    """
     async with aiohttp.ClientSession() as session:
         token_url = (
             f"{settings.KEYCLOAK_URL}/realms/master/protocol/openid-connect/token"
@@ -33,6 +42,18 @@ async def get_keycloak_token():
 async def create_keycloak_user(
     username: str, email: str, password: str, first_name: str, last_name: str
 ) -> bool:
+    """Creates a new user in Keycloak.
+
+    Args:
+        username (str): Username, must be unique.
+        email (str): Email.
+        password (str): Password.
+        first_name (str): First name.
+        last_name (str): Last name.
+
+    Returns:
+        bool: True if user was created successfully, False otherwise.
+    """
     access_token = await get_keycloak_token()
     headers = {
         "Authorization": f"Bearer {access_token}",

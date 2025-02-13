@@ -4,6 +4,8 @@ from app.services.azure.provisioning.storage import create_public_container
 
 
 class TestCreateBlobStorageContainer(unittest.TestCase):
+    """Test the creation of a public Blob Storage container in Azure."""
+
     def test_create_blob_storage_container(self):
         account_name = "tiendifyblobstoragetest"
         container_name = "test"

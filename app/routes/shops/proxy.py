@@ -21,6 +21,23 @@ async def shop_reverse_proxy(
     user: UserTokenInfo,
     file: Optional[UploadFile] = None,
 ):
+    """Reverse proxy for shop API. Takes an incoming request and forwards it to the correspondent shop API.
+
+    Args:
+        request (Request): Request object.
+        client_db (Prisma): Prisma client for db.
+        user (UserTokenInfo): Current user.
+        file (Optional[UploadFile], optional): File. Defaults to None.
+
+    Raises:
+        HTTPException: User not found
+        HTTPException: Shop not found
+        HTTPException: Resource group not found
+        HTTPException: Invalid URL
+
+    Returns:
+        JSONResponse: Response from shop API.
+    """
     user_info = await client_db.users.find_first(
         where={"email": user.email},
         include={
@@ -113,6 +130,7 @@ async def shop_get_proxy(
     client_db: Prisma = Depends(get_client_db),
     user=Depends(get_current_user),
 ):
+    """Forward GET requests to shop API."""
     return await shop_reverse_proxy(request, client_db, user)
 
 
@@ -123,6 +141,7 @@ async def shop_post_proxy(
     client_db: Prisma = Depends(get_client_db),
     user=Depends(get_current_user),
 ):
+    """Forward POST requests to shop API."""
     return await shop_reverse_proxy(request, client_db, user, image)
 
 
@@ -132,6 +151,7 @@ async def shop_put_proxy(
     client_db: Prisma = Depends(get_client_db),
     user=Depends(get_current_user),
 ):
+    """Forward PUT requests to shop API."""
     return await shop_reverse_proxy(request, client_db, user)
 
 
@@ -141,4 +161,5 @@ async def shop_delete_proxy(
     client_db: Prisma = Depends(get_client_db),
     user=Depends(get_current_user),
 ):
+    """Forward DELETE requests to shop API."""
     return await shop_reverse_proxy(request, client_db, user)

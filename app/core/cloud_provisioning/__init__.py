@@ -32,6 +32,14 @@ def get_storage_resource_name(shop_id: str) -> str:
 
 @celery.task
 def create_cloud_resources_for_user_task(shop_id: str) -> shop:
+    """Sync wrapper for `create_cloud_resources_for_user`.
+
+    Args:
+        shop_id (str): The shop ID
+
+    Returns:
+        shop: The updated shop object
+    """
     return async_to_sync(create_cloud_resources_for_user)(shop_id)
 
 

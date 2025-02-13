@@ -15,6 +15,12 @@ from app.routes.shops.proxy import router as shop_proxy_router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    """Controls the Lifespan of the application. Initializes the database connection and closes it when the application is closed.
+    And also adds the cookieAuth security scheme to the OpenAPI schema.
+
+    Args:
+        app (FastAPI): The FastAPI application instance.
+    """
     await client_db.connect()
     print("Connected to database")
 

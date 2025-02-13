@@ -4,6 +4,16 @@ from app.config.config import settings
 
 
 async def create_keycloak_realm(shop_id: str) -> dict:
+    """Creates a new Keycloak realm for a shop.
+
+    Args:
+        shop_id (str): Shop ID.
+
+    Raises:
+        Exception: Could not create realm.
+    Returns:
+        dict: Realm name, client ID, and client secret.
+    """
     realm_name = f"{settings.KEYCLOAK_REALM_PREFIX}{shop_id}"
 
     async with aiohttp.ClientSession() as session:
