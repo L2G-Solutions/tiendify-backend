@@ -95,20 +95,28 @@ async def handle_signup(payload: SignupPayload, db: Prisma = Depends(get_client_
             status_code=status.HTTP_400_BAD_REQUEST, detail="User already exists"
         )
 
-    res = await create_keycloak_user(payload.username, payload.email, payload.password, payload.firstName, payload.lastName)
+    res = await create_keycloak_user(
+        payload.username,
+        payload.email,
+        payload.password,
+        payload.firstName,
+        payload.lastName,
+    )
 
     if not res:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail="Error creating user"
         )
 
-    new_user = await db.users.create(data={
-        "email": payload.email,
-        "first_name": payload.firstName,
-        "last_name": payload.lastName,
-        "phone": payload.phone,
-        "role": "USER",
-        "email_verified": False
-    })
+    new_user = await db.users.create(
+        data={
+            "email": payload.email,
+            "first_name": payload.firstName,
+            "last_name": payload.lastName,
+            "phone": payload.phone,
+            "role": "USER",
+            "email_verified": False,
+        }
+    )
 
     return new_user

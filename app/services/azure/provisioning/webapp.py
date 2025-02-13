@@ -13,7 +13,7 @@ def create_web_app(
     sku_name: str = settings.AZURE_WEBAPP_DEFAULT_SKU,
     sku_tier: str = settings.AZURE_WEBAPP_DEFAULT_TIER,
     docker_image: str = settings.SHOPS_BACKEND_DOCKER_IMAGE,
-    env_vars: Optional[dict] = None
+    env_vars: Optional[dict] = None,
 ) -> Site:
     web_client = WebSiteManagementClient(credential, settings.AZURE_SUBSCRIPTION_ID)
 
@@ -35,7 +35,11 @@ def create_web_app(
             server_farm_id=app_service_plan.id,
             site_config=SiteConfig(
                 linux_fx_version=f"DOCKER|{docker_image}",
-                app_settings=list({"name": k, "value": v} for k, v in env_vars.items()) if env_vars else None,
+                app_settings=(
+                    list({"name": k, "value": v} for k, v in env_vars.items())
+                    if env_vars
+                    else None
+                ),
             ),
         ),
     ).result()
