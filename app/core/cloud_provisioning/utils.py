@@ -8,6 +8,16 @@ def build_database_url(host: str, username: str, password: str) -> str:
 
 
 def send_store_created_email(user_name: str, user_email: str, store_name: str):
+    """Sends welcome email to the user after shop cloud resources provisioning.
+
+    Args:
+        user_name (str): User's name
+        user_email (str): User's email
+        store_name (str): Store name
+
+    Raises:
+        Exception: Failed to send email
+    """
     mail_templates = MailTemplates()
     mail_sender = MailSender()
     mail_content = mail_templates.render_store_created_template(user_name, store_name)

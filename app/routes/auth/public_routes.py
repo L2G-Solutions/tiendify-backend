@@ -13,7 +13,12 @@ from database.client_db import Prisma
 router = APIRouter()
 
 
-@router.get("/login", summary="Redirect to Keycloak login page", tags=["auth"])
+@router.get(
+    "/login",
+    summary="Redirect to Keycloak login page",
+    description="Initializes a new authentication flow. Redirects to Keycloak login page.",
+    tags=["auth"],
+)
 async def redirect_to_keycloak(
     request: Request, redirect_uri: str = None, next: str = None
 ):
@@ -36,6 +41,7 @@ async def redirect_to_keycloak(
 @router.post(
     "/authorize",
     summary="Takes the authorization code and set the access token",
+    description="Takes the authorization code returned by Keycloak after successful authentication and sets the access and refresh tokens as cookies.",
     tags=["auth"],
 )
 async def authorize(
@@ -87,7 +93,7 @@ async def authorize(
     return response
 
 
-@router.post("/signup")
+@router.post("/signup", summary="Signup new user", tags=["auth"])
 async def handle_signup(payload: SignupPayload, db: Prisma = Depends(get_client_db)):
     user = await db.users.find_unique(where={"email": payload.email})
     if user:
@@ -95,20 +101,28 @@ async def handle_signup(payload: SignupPayload, db: Prisma = Depends(get_client_
             status_code=status.HTTP_400_BAD_REQUEST, detail="User already exists"
         )
 
-    res = await create_keycloak_user(payload.username, payload.email, payload.password, payload.firstName, payload.lastName)
+    res = await create_keycloak_user(
+        payload.username,
+        payload.email,
+        payload.password,
+        payload.firstName,
+        payload.lastName,
+    )
 
     if not res:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail="Error creating user"
         )
 
-    new_user = await db.users.create(data={
-        "email": payload.email,
-        "first_name": payload.firstName,
-        "last_name": payload.lastName,
-        "phone": payload.phone,
-        "role": "USER",
-        "email_verified": False
-    })
+    new_user = await db.users.create(
+        data={
+            "email": payload.email,
+            "first_name": payload.firstName,
+            "last_name": payload.lastName,
+            "phone": payload.phone,
+            "role": "USER",
+            "email_verified": False,
+        }
+    )
 
     return new_user

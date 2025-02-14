@@ -27,6 +27,19 @@ async def valid_access_token(
     ),
     refresh_token: str = Depends(refresh_cookie_scheme),
 ):
+    """Validates the access token and returns the decoded token data.
+
+    Args:
+        access_token (str, optional): Access token. Defaults to Depends( cookie_scheme, ).
+        refresh_token (str, optional): Refresh token. Defaults to Depends(refresh_cookie_scheme).
+
+    Raises:
+        HTTPException: 401 - Not authenticated
+        HTTPException: 403 - Not authenticated, refresh token present
+
+    Returns:
+        dict: Decoded token data.
+    """
     if not refresh_token:
         raise HTTPException(status_code=401, detail="Not authenticated")
 
@@ -55,6 +68,12 @@ async def valid_access_token(
 
 
 def has_role(role_name: str):
+    """Decorator to check if the user has the required role.
+
+    Args:
+        role_name (str): Role name.
+    """
+
     async def check_role(token_data: Annotated[dict, Depends(valid_access_token)]):
         resource_access = token_data.get("resource_access")
 
@@ -76,6 +95,17 @@ def has_role(role_name: str):
 async def get_current_user(
     token_data: Annotated[dict, Depends(valid_access_token)]
 ) -> UserTokenInfo:
+    """Dependency to get the current user information.
+
+    Args:
+        token_data (Annotated[dict, Depends): Token data.
+
+    Raises:
+        HTTPException: 400 - Invalid token structure
+
+    Returns:
+        UserTokenInfo: User information.
+    """
     try:
         user_info = {
             "username": token_data.get("preferred_username"),
@@ -84,5 +114,5 @@ async def get_current_user(
             "lastName": token_data.get("family_name"),
         }
         return UserTokenInfo(**user_info)
-    except KeyError as e:
+    except KeyError:
         raise HTTPException(status_code=400, detail="Invalid token structure")

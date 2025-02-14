@@ -11,7 +11,7 @@ from database.client_db import Prisma
 router = APIRouter()
 
 
-@router.post("/", tags=["shops"])
+@router.post("/", tags=["shops"], summary="Create a new shop")
 async def create_shop(
     shop: ShopCreate,
     db: Prisma = Depends(get_client_db),
@@ -47,7 +47,12 @@ async def create_shop(
     return new_shop
 
 
-@router.get("/resources", tags=["shops"])
+@router.get(
+    "/resources",
+    tags=["shops"],
+    summary="Get shop cloud resources",
+    description="Get the cloud resources of the shop for the currently logged in user.",
+)
 async def handle_get_shop_resources(
     user: UserTokenInfo = Depends(get_current_user), db: Prisma = Depends(get_client_db)
 ):

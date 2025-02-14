@@ -1,11 +1,15 @@
 import unittest
-import aiohttp
 import uuid
 
-from app.services.keycloak.realm import create_keycloak_realm
+import aiohttp
+
 from app.config.config import Settings
+from app.services.keycloak.realm import create_keycloak_realm
+
 
 class TestCreateKeycloakRealm(unittest.IsolatedAsyncioTestCase):
+    """Tests the creation of a Keycloak realm."""
+
     @classmethod
     def setUpClass(cls):
         cls.settings = Settings(

@@ -1,19 +1,33 @@
 import aiohttp
+
 from app.config.config import settings
 
+
 async def create_keycloak_realm(shop_id: str) -> dict:
+    """Creates a new Keycloak realm for a shop.
+
+    Args:
+        shop_id (str): Shop ID.
+
+    Raises:
+        Exception: Could not create realm.
+    Returns:
+        dict: Realm name, client ID, and client secret.
+    """
     realm_name = f"{settings.KEYCLOAK_REALM_PREFIX}{shop_id}"
-    
+
     async with aiohttp.ClientSession() as session:
         # 1. Obtener token de administrador
-        token_url = f"{settings.KEYCLOAK_URL}/realms/master/protocol/openid-connect/token"
+        token_url = (
+            f"{settings.KEYCLOAK_URL}/realms/master/protocol/openid-connect/token"
+        )
         auth_data = {
             "client_id": "admin-cli",
             "username": settings.KEYCLOAK_ADMIN_USER,
             "password": settings.KEYCLOAK_ADMIN_PASSWORD,
-            "grant_type": "password"
+            "grant_type": "password",
         }
-        
+
         async with session.post(token_url, data=auth_data) as resp:
             print(f"Obteniendo token response status: {resp.status}")
             if resp.status != 200:
@@ -29,13 +43,13 @@ async def create_keycloak_realm(shop_id: str) -> dict:
         realm_url = f"{settings.KEYCLOAK_URL}/admin/realms"
         headers = {
             "Authorization": f"Bearer {access_token}",
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
         }
         realm_config = {
             "realm": realm_name,
             "enabled": True,
             "registrationAllowed": True,
-            "loginWithEmailAllowed": True
+            "loginWithEmailAllowed": True,
         }
 
         async with session.post(realm_url, json=realm_config, headers=headers) as resp:
@@ -57,16 +71,22 @@ async def create_keycloak_realm(shop_id: str) -> dict:
             "serviceAccountsEnabled": True,
             "publicClient": False,
             "protocolMappers": [],
-            "attributes": {}
+            "attributes": {},
         }
 
-        client_creation_url = f"{settings.KEYCLOAK_URL}/admin/realms/{realm_name}/clients"
-        async with session.post(client_creation_url, json=client_config, headers=headers) as resp:
+        client_creation_url = (
+            f"{settings.KEYCLOAK_URL}/admin/realms/{realm_name}/clients"
+        )
+        async with session.post(
+            client_creation_url, json=client_config, headers=headers
+        ) as resp:
             print(f"Crear cliente response status: {resp.status}")
             if resp.status == 201:
                 client_location = resp.headers.get("Location")
                 if not client_location:
-                    raise Exception("Respuesta de creación de cliente sin encabezado Location")
+                    raise Exception(
+                        "Respuesta de creación de cliente sin encabezado Location"
+                    )
                 client_id = client_location.split("/")[-1]
                 print(f"Cliente creado con ID: {client_id}")
             elif resp.status == 409:
@@ -79,7 +99,9 @@ async def create_keycloak_realm(shop_id: str) -> dict:
                         raise Exception(f"Error listando clientes: {error}")
                     clients = await list_resp.json()
                     if not clients:
-                        raise Exception("Cliente 'admin-client' no encontrado después de conflicto.")
+                        raise Exception(
+                            "Cliente 'admin-client' no encontrado después de conflicto."
+                        )
                     client_id = clients[0]["id"]
                     print(f"Cliente existente encontrado con ID: {client_id}")
             else:
@@ -116,7 +138,9 @@ async def create_keycloak_realm(shop_id: str) -> dict:
             print(f"Obtener roles de 'realm-management' response status: {resp.status}")
             if resp.status != 200:
                 error = await resp.text()
-                raise Exception(f"Error obteniendo roles de 'realm-management': {error}")
+                raise Exception(
+                    f"Error obteniendo roles de 'realm-management': {error}"
+                )
             roles = await resp.json()
             role_names = [role["name"] for role in roles]
 
@@ -125,18 +149,24 @@ async def create_keycloak_realm(shop_id: str) -> dict:
         roles_to_assign = [role for role in roles if role["name"] in required_roles]
 
         if not roles_to_assign:
-            raise Exception("No se encontraron los roles requeridos para asignar al cliente.")
+            raise Exception(
+                "No se encontraron los roles requeridos para asignar al cliente."
+            )
 
         # 8. Asignar roles al usuario de cuenta de servicio (usando la ruta de client roles)
         assign_roles_url = (
             f"{settings.KEYCLOAK_URL}/admin/realms/{realm_name}/users/"
             f"{service_account_id}/role-mappings/clients/{realm_management_id}"
         )
-        async with session.post(assign_roles_url, json=roles_to_assign, headers=headers) as resp:
+        async with session.post(
+            assign_roles_url, json=roles_to_assign, headers=headers
+        ) as resp:
             print(f"Asignar roles response status: {resp.status}")
             if resp.status != 204:
                 error = await resp.text()
-                raise Exception(f"Error asignando roles al service account user: {error}")
+                raise Exception(
+                    f"Error asignando roles al service account user: {error}"
+                )
             print("Roles asignados al service account user.")
 
         # 9. Obtener secreto del cliente
@@ -156,5 +186,5 @@ async def create_keycloak_realm(shop_id: str) -> dict:
     return {
         "realm_name": realm_name,
         "client_id": client_id,
-        "client_secret": client_secret
+        "client_secret": client_secret,
     }

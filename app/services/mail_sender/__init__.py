@@ -20,6 +20,8 @@ logger = logging.getLogger(__name__)
 
 
 class MailSender:
+    """Service class to send emails using SendGrid API."""
+
     def __init__(self):
         self.email_service = SendGridAPIClient(settings.EMAIL_SERVICE_API_KEY)
 

@@ -38,7 +38,7 @@ def create_blob_storage_account(
         access_tier=AccessTier.HOT,
     )
 
-    storage_account = storage_client.storage_accounts.begin_create(
+    storage_client.storage_accounts.begin_create(
         resource_group_name=settings.AZURE_RESOURCE_GROUP,
         account_name=account_name,
         parameters=storage_parameters,
@@ -57,6 +57,15 @@ def create_blob_storage_account(
 def create_public_container(
     account_name: str, container_name: str = "public"
 ) -> ContainerClient:
+    """Creates a public container in a Blob Storage Account.
+
+    Args:
+        account_name (str): Name of the storage account.
+        container_name (str, optional): Container name, must be unique. Defaults to "public".
+
+    Returns:
+        ContainerClient: The created container.
+    """
     storage_client = StorageManagementClient(credential, settings.AZURE_SUBSCRIPTION_ID)
 
     keys = storage_client.storage_accounts.list_keys(

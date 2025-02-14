@@ -3,6 +3,8 @@ from fastapi.templating import Jinja2Templates
 
 
 class MailTemplates:
+    """Class for rendering email HTML templates using Jinja2Templates."""
+
     def __init__(self):
         self.templates = Jinja2Templates(directory="app/templates/emails")
 
