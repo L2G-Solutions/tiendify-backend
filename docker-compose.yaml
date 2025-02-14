@@ -1,0 +1,93 @@
+services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  identity:
+    image: keycloak/keycloak:26.1
+    environment:
+      KEYCLOAK_USER: admin
+      KEYCLOAK_PASSWORD: admin
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      KEYCLOAK_IMPORT: "/opt/keycloak/data/import/realm-export.json"
+      KC_HEALTH_ENABLED: "true"
+    command: ["start-dev", "--http-port", "7080", "--import-realm"]
+    ports:
+      - "7080:7080"
+    volumes:
+      - ./realm-export.json:/opt/keycloak/data/import/realm-export.json
+      - ./tiendify.jar:/opt/keycloak/providers/tiendify.jar
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:7080/health/ready"]
+      interval: 15s
+      timeout: 2s
+      retries: 15
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:80"
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      PROJECT_NAME: "Tiendify"
+      DATABASE_URL: "postgresql://postgres:postgres@db:5432/postgres"
+      AZURE_STORAGE: "${AZURE_STORAGE}"
+      AZURE_PUBLIC_CONTAINER: "${AZURE_PUBLIC_CONTAINER}"
+      SECRET_KEY: "test-secret-key"
+      KEYCLOAK_URL: "http://localhost:7080"
+      KEYCLOAK_CLIENT_ID: "tiendify"
+      KEYCLOAK_REALM: "Tiendify"
+      KEYCLOAK_CLIENT_SECRET: "WCF6ceuxRB8O6ybHjWst0B4xXWOQydSL"
+    entrypoint:
+      [
+        "sh",
+        "-c",
+        "prisma migrate dev --name init || prisma generate && python -m uvicorn main:app --host 0.0.0.0 --port 80",
+      ]
+    volumes:
+      - ./keycloak-init.sh:/app/keycloak-init.sh
+
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+
+  celery:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - api
+      - redis
+    environment:
+      PROJECT_NAME: "Tiendify"
+      DATABASE_URL: "postgresql://postgres:postgres@db:5432/postgres"
+      AZURE_STORAGE: "${AZURE_STORAGE}"
+      AZURE_PUBLIC_CONTAINER: "${AZURE_PUBLIC_CONTAINER}"
+      SECRET_KEY: "test-secret-key"
+      KEYCLOAK_URL: "http://localhost:7080"
+      KEYCLOAK_CLIENT_ID: "tiendify"
+      KEYCLOAK_REALM: "Tiendify"
+      KEYCLOAK_CLIENT_SECRET: "WCF6ceuxRB8O6ybHjWst0B4xXWOQydSL"
+      CELERY_BROKER_URL: "redis://redis:6379/0"
+    entrypoint:
+      [
+        "sh",
+        "-c",
+        "celery -A app.core.tasks.celery worker --pool=solo --loglevel=info",
+      ]
